@@ -12,6 +12,7 @@ import com.example.personalfinance.FinanceApplication
 import com.example.personalfinance.R
 import com.example.personalfinance.data.model.Transaction
 import com.example.personalfinance.databinding.FragmentBudgetBinding
+import com.example.personalfinance.domain.FinanceCalculator
 import com.example.personalfinance.ui.adapter.BudgetAdapter
 import com.example.personalfinance.viewmodel.BudgetViewModel
 import com.example.personalfinance.viewmodel.BudgetViewModelFactory
@@ -59,6 +60,7 @@ class BudgetFragment : Fragment() {
         setupClickListeners()
         updateMonthDisplay()
         observeData()
+        budgetViewModel.selectPeriod(currentMonth, currentYear)
     }
 
     private fun setupRecyclerView() {
@@ -67,9 +69,7 @@ class BudgetFragment : Fragment() {
                 val action = BudgetFragmentDirections.actionBudgetToAddBudget(budget.id)
                 findNavController().navigate(action)
             },
-            getSpentAmount = { category ->
-                calculateSpentAmount(category)
-            }
+            getSpentAmount = { category -> calculateSpentAmount(category) }
         )
 
         binding.rvBudgets.apply {
@@ -79,23 +79,13 @@ class BudgetFragment : Fragment() {
     }
 
     private fun calculateSpentAmount(category: String): Double {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.YEAR, currentYear)
-        calendar.set(Calendar.MONTH, currentMonth - 1)
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        val startOfMonth = calendar.timeInMillis
-
-        calendar.add(Calendar.MONTH, 1)
-        calendar.add(Calendar.MILLISECOND, -1)
-        val endOfMonth = calendar.timeInMillis
-
-        return transactionsList
-            .filter { it.type == "expense" && it.category == category && it.date in startOfMonth..endOfMonth }
-            .sumOf { it.amount }
+        val (startOfMonth, endOfMonth) = monthBounds(currentMonth, currentYear)
+        return FinanceCalculator.spentForCategory(
+            transactions = transactionsList,
+            category = category,
+            startInclusive = startOfMonth,
+            endInclusive = endOfMonth
+        )
     }
 
     private fun setupClickListeners() {
@@ -110,8 +100,7 @@ class BudgetFragment : Fragment() {
             } else {
                 currentMonth--
             }
-            updateMonthDisplay()
-            loadBudgets()
+            onPeriodChanged()
         }
 
         binding.ivNextMonth.setOnClickListener {
@@ -121,25 +110,23 @@ class BudgetFragment : Fragment() {
             } else {
                 currentMonth++
             }
-            updateMonthDisplay()
-            loadBudgets()
+            onPeriodChanged()
         }
+    }
+
+    private fun onPeriodChanged() {
+        updateMonthDisplay()
+        budgetViewModel.selectPeriod(currentMonth, currentYear)
+        budgetAdapter.notifyDataSetChanged()
     }
 
     private fun updateMonthDisplay() {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.YEAR, currentYear)
-        calendar.set(Calendar.MONTH, currentMonth - 1)
-
-        val sdf = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        binding.tvMonth.text = sdf.format(calendar.time)
-    }
-
-    private fun loadBudgets() {
-        budgetViewModel.getBudgetsByMonth(currentMonth, currentYear).observe(viewLifecycleOwner) { budgets ->
-            budgetAdapter.submitList(budgets)
-            updateEmptyState(budgets.isEmpty())
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.YEAR, currentYear)
+            set(Calendar.MONTH, currentMonth - 1)
         }
+
+        binding.tvMonth.text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(calendar.time)
     }
 
     private fun updateEmptyState(isEmpty: Boolean) {
@@ -153,7 +140,27 @@ class BudgetFragment : Fragment() {
             budgetAdapter.notifyDataSetChanged()
         }
 
-        loadBudgets()
+        budgetViewModel.budgetsForSelectedPeriod.observe(viewLifecycleOwner) { budgets ->
+            budgetAdapter.submitList(budgets)
+            updateEmptyState(budgets.isEmpty())
+        }
+    }
+
+    private fun monthBounds(month: Int, year: Int): Pair<Long, Long> {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month - 1)
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val start = calendar.timeInMillis
+
+        calendar.add(Calendar.MONTH, 1)
+        calendar.add(Calendar.MILLISECOND, -1)
+        return start to calendar.timeInMillis
     }
 
     override fun onDestroyView() {
