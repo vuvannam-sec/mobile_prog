@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.github.vuvannamsec.personalfinance.FinanceApplication
 import io.github.vuvannamsec.personalfinance.R
+import io.github.vuvannamsec.personalfinance.data.model.Transaction
 import io.github.vuvannamsec.personalfinance.databinding.FragmentTransactionsBinding
 import io.github.vuvannamsec.personalfinance.ui.adapter.TransactionAdapter
 import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModel
@@ -27,7 +28,8 @@ class TransactionsFragment : Fragment() {
     }
 
     private lateinit var transactionAdapter: TransactionAdapter
-    private var currentFilter = "all"
+    private var currentFilter = FILTER_ALL
+    private var transactions: List<Transaction> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,35 +70,30 @@ class TransactionsFragment : Fragment() {
     private fun setupFilterChips() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
             currentFilter = when {
-                checkedIds.contains(R.id.chip_income) -> "income"
-                checkedIds.contains(R.id.chip_expense) -> "expense"
-                else -> "all"
+                checkedIds.contains(R.id.chip_income) -> FILTER_INCOME
+                checkedIds.contains(R.id.chip_expense) -> FILTER_EXPENSE
+                else -> FILTER_ALL
             }
-            applyFilter()
+            renderTransactions()
         }
     }
 
-    private fun applyFilter() {
-        when (currentFilter) {
-            "income" -> {
-                viewModel.getTransactionsByType("income").observe(viewLifecycleOwner) { transactions ->
-                    transactionAdapter.submitList(transactions)
-                    updateEmptyState(transactions.isEmpty())
-                }
-            }
-            "expense" -> {
-                viewModel.getTransactionsByType("expense").observe(viewLifecycleOwner) { transactions ->
-                    transactionAdapter.submitList(transactions)
-                    updateEmptyState(transactions.isEmpty())
-                }
-            }
-            else -> {
-                viewModel.allTransactions.observe(viewLifecycleOwner) { transactions ->
-                    transactionAdapter.submitList(transactions)
-                    updateEmptyState(transactions.isEmpty())
-                }
-            }
+    private fun observeData() {
+        viewModel.allTransactions.observe(viewLifecycleOwner) { items ->
+            transactions = items
+            renderTransactions()
         }
+    }
+
+    private fun renderTransactions() {
+        val visibleTransactions = when (currentFilter) {
+            FILTER_INCOME -> transactions.filter { it.type == FILTER_INCOME }
+            FILTER_EXPENSE -> transactions.filter { it.type == FILTER_EXPENSE }
+            else -> transactions
+        }
+
+        transactionAdapter.submitList(visibleTransactions)
+        updateEmptyState(visibleTransactions.isEmpty())
     }
 
     private fun updateEmptyState(isEmpty: Boolean) {
@@ -104,17 +101,14 @@ class TransactionsFragment : Fragment() {
         binding.rvTransactions.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
-    private fun observeData() {
-        viewModel.allTransactions.observe(viewLifecycleOwner) { transactions ->
-            if (currentFilter == "all") {
-                transactionAdapter.submitList(transactions)
-                updateEmptyState(transactions.isEmpty())
-            }
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val FILTER_ALL = "all"
+        private const val FILTER_INCOME = "income"
+        private const val FILTER_EXPENSE = "expense"
     }
 }
