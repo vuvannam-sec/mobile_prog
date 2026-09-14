@@ -45,8 +45,10 @@ class BudgetFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        currentMonth = savedInstanceState?.getInt(STATE_MONTH) ?: currentMonth
-        currentYear = savedInstanceState?.getInt(STATE_YEAR) ?: currentYear
+        savedInstanceState?.let { state ->
+            currentMonth = state.getInt(STATE_MONTH, currentMonth)
+            currentYear = state.getInt(STATE_YEAR, currentYear)
+        }
     }
 
     override fun onCreateView(
