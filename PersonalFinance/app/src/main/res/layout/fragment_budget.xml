@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.personalfinance.viewmodel.BudgetViewModel" />
+            type="io.github.vuvannamsec.personalfinance.viewmodel.BudgetViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
