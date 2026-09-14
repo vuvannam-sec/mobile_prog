@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
@@ -21,12 +22,11 @@ import com.example.personalfinance.viewmodel.CategoryViewModel
 import com.example.personalfinance.viewmodel.CategoryViewModelFactory
 import com.example.personalfinance.viewmodel.TransactionViewModel
 import com.example.personalfinance.viewmodel.TransactionViewModelFactory
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 
 class AddTransactionFragment : Fragment() {
 
@@ -52,6 +52,7 @@ class AddTransactionFragment : Fragment() {
     private var selectedDate: Long = System.currentTimeMillis()
     private var currentType = "expense"
     private var editingTransaction: Transaction? = null
+    private var pendingCategoryName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,25 +96,34 @@ class AddTransactionFragment : Fragment() {
 
     private fun setupTypeToggle() {
         binding.toggleType.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                currentType = when (checkedId) {
-                    R.id.btn_income -> "income"
-                    else -> "expense"
-                }
-                loadCategoriesByType()
-            }
-        }
-    }
+            if (!isChecked) return@addOnButtonCheckedListener
 
-    private fun loadCategoriesByType() {
-        categoryViewModel.getCategoriesByType(currentType).observe(viewLifecycleOwner) { categories ->
-            categoryAdapter.submitList(categories)
-            selectedCategory = null
+            val newType = if (checkedId == R.id.btn_income) "income" else "expense"
+            if (newType != currentType) {
+                currentType = newType
+                selectedCategory = null
+                categoryAdapter.setSelectedCategory("")
+            }
+
+            categoryViewModel.selectType(currentType)
         }
     }
 
     private fun observeCategories() {
-        loadCategoriesByType()
+        categoryViewModel.categoriesForSelectedType.observe(viewLifecycleOwner) { categories ->
+            categoryAdapter.submitList(categories) {
+                applyPendingCategorySelection()
+            }
+        }
+    }
+
+    private fun applyPendingCategorySelection() {
+        val categoryName = pendingCategoryName ?: return
+        val category = categoryAdapter.currentList.firstOrNull { it.name == categoryName } ?: return
+
+        selectedCategory = category
+        categoryAdapter.setSelectedCategory(categoryName)
+        pendingCategoryName = null
     }
 
     private fun showDatePicker() {
@@ -147,21 +157,20 @@ class AddTransactionFragment : Fragment() {
                 selectedDate = transaction.date
                 updateDateDisplay()
 
+                pendingCategoryName = transaction.category
                 currentType = transaction.type
-                if (transaction.type == "income") {
-                    binding.toggleType.check(R.id.btn_income)
-                } else {
-                    binding.toggleType.check(R.id.btn_expense)
-                }
-
-                categoryAdapter.setSelectedCategory(transaction.category)
+                binding.toggleType.check(
+                    if (transaction.type == "income") R.id.btn_income else R.id.btn_expense
+                )
+                categoryViewModel.selectType(currentType)
+                applyPendingCategorySelection()
             }
         }
     }
 
     private fun saveTransaction() {
-        val amountText = binding.etAmount.text.toString()
-        val note = binding.etNote.text.toString()
+        val amountText = binding.etAmount.text.toString().trim()
+        val note = binding.etNote.text.toString().trim()
 
         if (amountText.isEmpty()) {
             binding.tilAmount.error = "Please enter amount"
@@ -173,8 +182,10 @@ class AddTransactionFragment : Fragment() {
             binding.tilAmount.error = "Please enter valid amount"
             return
         }
+        binding.tilAmount.error = null
 
-        if (selectedCategory == null) {
+        val category = selectedCategory
+        if (category == null) {
             Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show()
             return
         }
@@ -182,7 +193,7 @@ class AddTransactionFragment : Fragment() {
         val transaction = Transaction(
             id = editingTransaction?.id ?: 0,
             amount = amount,
-            category = selectedCategory!!.name,
+            category = category.name,
             type = currentType,
             note = note,
             date = selectedDate
