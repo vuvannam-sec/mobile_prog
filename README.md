@@ -16,7 +16,7 @@ A local-first Android application for tracking personal income, expenses, and bu
 
 - Kotlin
 - Android SDK 35, min SDK 24
-- Android Views with View Binding
+- Android Views with View Binding and Data Binding
 - Room
 - ViewModel and LiveData
 - Navigation Component and Safe Args
@@ -28,11 +28,12 @@ A local-first Android application for tracking personal income, expenses, and bu
 
 ```text
 PersonalFinance/
-├── app/src/main/java/com/example/personalfinance/
+├── app/src/main/java/io/github/vuvannamsec/personalfinance/
 │   ├── data/
 │   │   ├── database/      # Room database and DAOs
 │   │   ├── model/         # Transaction, category, and budget entities
 │   │   └── repository/    # Data access layer
+│   ├── domain/            # Pure finance calculations
 │   ├── ui/                # Screens and RecyclerView adapters
 │   ├── viewmodel/         # UI state and data coordination
 │   ├── FinanceApplication.kt
@@ -63,14 +64,19 @@ Run the same checks used by CI:
 
 ```bash
 cd PersonalFinance
-./gradlew testDebugUnitTest lintDebug assembleDebug
+./gradlew --no-daemon \
+  testDebugUnitTest \
+  lintDebug \
+  assembleDebug \
+  assembleDebugAndroidTest \
+  assembleRelease
 ```
 
-Pull requests are checked automatically with GitHub Actions.
+Pull requests are checked automatically with GitHub Actions. Instrumentation test sources are compiled in CI; executing them requires an Android device or emulator.
 
 ## Data and privacy
 
-Financial data is stored in the app's local Room database. The current application manifest does not request network access, and the project does not contain backend or cloud-sync integration.
+Financial data is stored in the app's local Room database. The application does not request network access, cleartext traffic is disabled, and Android backup is disabled for app data. The project does not contain backend or cloud-sync integration.
 
 ## Current scope
 
