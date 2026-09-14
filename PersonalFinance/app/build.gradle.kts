@@ -36,7 +36,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        dataBinding = true
     }
 }
 
@@ -47,26 +46,20 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
-    // Lifecycle
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
 
-    // Navigation
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
 
-    // Coroutines
     implementation(libs.coroutines.android)
+    implementation(libs.mpandroidchart)
 
-    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
