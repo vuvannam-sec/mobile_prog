@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.github.vuvannamsec.personalfinance.FinanceApplication
-import io.github.vuvannamsec.personalfinance.R
 import io.github.vuvannamsec.personalfinance.data.model.Transaction
 import io.github.vuvannamsec.personalfinance.databinding.FragmentBudgetBinding
 import io.github.vuvannamsec.personalfinance.domain.FinanceCalculator
@@ -44,6 +43,12 @@ class BudgetFragment : Fragment() {
     private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
     private var transactionsList: List<Transaction> = emptyList()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        currentMonth = savedInstanceState?.getInt(STATE_MONTH) ?: currentMonth
+        currentYear = savedInstanceState?.getInt(STATE_YEAR) ?: currentYear
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,7 +71,11 @@ class BudgetFragment : Fragment() {
     private fun setupRecyclerView() {
         budgetAdapter = BudgetAdapter(
             onItemClick = { budget ->
-                val action = BudgetFragmentDirections.actionBudgetToAddBudget(budget.id)
+                val action = BudgetFragmentDirections.actionBudgetToAddBudget(
+                    budget.id,
+                    budget.month,
+                    budget.year
+                )
                 findNavController().navigate(action)
             },
             getSpentAmount = { category -> calculateSpentAmount(category) }
@@ -90,7 +99,12 @@ class BudgetFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.fabAdd.setOnClickListener {
-            findNavController().navigate(R.id.action_budget_to_addBudget)
+            val action = BudgetFragmentDirections.actionBudgetToAddBudget(
+                -1L,
+                currentMonth,
+                currentYear
+            )
+            findNavController().navigate(action)
         }
 
         binding.ivPrevMonth.setOnClickListener {
@@ -163,8 +177,19 @@ class BudgetFragment : Fragment() {
         return start to calendar.timeInMillis
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(STATE_MONTH, currentMonth)
+        outState.putInt(STATE_YEAR, currentYear)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val STATE_MONTH = "selected_month"
+        private const val STATE_YEAR = "selected_year"
     }
 }
