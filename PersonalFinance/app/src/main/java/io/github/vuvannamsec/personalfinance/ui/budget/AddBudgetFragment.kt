@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import io.github.vuvannamsec.personalfinance.FinanceApplication
+import io.github.vuvannamsec.personalfinance.R
 import io.github.vuvannamsec.personalfinance.data.model.Budget
 import io.github.vuvannamsec.personalfinance.databinding.FragmentAddBudgetBinding
 import io.github.vuvannamsec.personalfinance.viewmodel.BudgetViewModel
@@ -107,19 +108,19 @@ class AddBudgetFragment : Fragment() {
         val selectedCategory = binding.spinnerCategory.selectedItem?.toString()
 
         if (amountText.isEmpty()) {
-            binding.tilAmount.error = "Please enter amount"
+            binding.tilAmount.error = getString(R.string.amount_required)
             return
         }
 
         val amount = amountText.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            binding.tilAmount.error = "Please enter valid amount"
+            binding.tilAmount.error = getString(R.string.amount_invalid)
             return
         }
         binding.tilAmount.error = null
 
         if (selectedCategory.isNullOrEmpty()) {
-            Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.category_required, Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -143,10 +144,10 @@ class AddBudgetFragment : Fragment() {
 
         if (editingBudget != null) {
             budgetViewModel.update(budget)
-            Toast.makeText(requireContext(), "Budget updated", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.budget_updated, Toast.LENGTH_SHORT).show()
         } else {
             budgetViewModel.insert(budget)
-            Toast.makeText(requireContext(), "Budget added", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.budget_added, Toast.LENGTH_SHORT).show()
         }
 
         findNavController().navigateUp()
