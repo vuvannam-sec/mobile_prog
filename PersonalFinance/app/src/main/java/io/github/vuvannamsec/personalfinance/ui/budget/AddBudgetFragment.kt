@@ -103,7 +103,7 @@ class AddBudgetFragment : Fragment() {
     }
 
     private fun saveBudget() {
-        val amountText = binding.etAmount.text.toString()
+        val amountText = binding.etAmount.text.toString().trim()
         val selectedCategory = binding.spinnerCategory.selectedItem?.toString()
 
         if (amountText.isEmpty()) {
@@ -116,6 +116,7 @@ class AddBudgetFragment : Fragment() {
             binding.tilAmount.error = "Please enter valid amount"
             return
         }
+        binding.tilAmount.error = null
 
         if (selectedCategory.isNullOrEmpty()) {
             Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show()
@@ -123,15 +124,21 @@ class AddBudgetFragment : Fragment() {
         }
 
         val calendar = Calendar.getInstance()
-        val currentMonth = calendar.get(Calendar.MONTH) + 1
-        val currentYear = calendar.get(Calendar.YEAR)
+        val fallbackMonth = calendar.get(Calendar.MONTH) + 1
+        val fallbackYear = calendar.get(Calendar.YEAR)
+        val targetMonth = editingBudget?.month
+            ?: args.month.takeIf { it in 1..12 }
+            ?: fallbackMonth
+        val targetYear = editingBudget?.year
+            ?: args.year.takeIf { it > 0 }
+            ?: fallbackYear
 
         val budget = Budget(
             id = editingBudget?.id ?: 0,
             category = selectedCategory,
             amount = amount,
-            month = editingBudget?.month ?: currentMonth,
-            year = editingBudget?.year ?: currentYear
+            month = targetMonth,
+            year = targetYear
         )
 
         if (editingBudget != null) {
