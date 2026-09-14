@@ -23,10 +23,9 @@ import io.github.vuvannamsec.personalfinance.viewmodel.CategoryViewModelFactory
 import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModel
 import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModelFactory
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 class AddTransactionFragment : Fragment() {
 
@@ -144,8 +143,7 @@ class AddTransactionFragment : Fragment() {
     }
 
     private fun updateDateDisplay() {
-        val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        binding.tvDate.text = sdf.format(Date(selectedDate))
+        binding.tvDate.text = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(selectedDate))
     }
 
     private fun loadTransaction(id: Long) {
@@ -173,20 +171,20 @@ class AddTransactionFragment : Fragment() {
         val note = binding.etNote.text.toString().trim()
 
         if (amountText.isEmpty()) {
-            binding.tilAmount.error = "Please enter amount"
+            binding.tilAmount.error = getString(R.string.amount_required)
             return
         }
 
         val amount = amountText.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            binding.tilAmount.error = "Please enter valid amount"
+            binding.tilAmount.error = getString(R.string.amount_invalid)
             return
         }
         binding.tilAmount.error = null
 
         val category = selectedCategory
         if (category == null) {
-            Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.category_required, Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -201,10 +199,10 @@ class AddTransactionFragment : Fragment() {
 
         if (editingTransaction != null) {
             transactionViewModel.update(transaction)
-            Toast.makeText(requireContext(), "Transaction updated", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.transaction_updated, Toast.LENGTH_SHORT).show()
         } else {
             transactionViewModel.insert(transaction)
-            Toast.makeText(requireContext(), "Transaction added", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.transaction_added, Toast.LENGTH_SHORT).show()
         }
 
         findNavController().navigateUp()
