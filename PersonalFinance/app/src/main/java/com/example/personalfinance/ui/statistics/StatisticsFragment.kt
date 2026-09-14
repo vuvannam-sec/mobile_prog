@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import com.example.personalfinance.FinanceApplication
 import com.example.personalfinance.R
 import com.example.personalfinance.databinding.FragmentStatisticsBinding
+import com.example.personalfinance.domain.FinanceCalculator
 import com.example.personalfinance.viewmodel.TransactionViewModel
 import com.example.personalfinance.viewmodel.TransactionViewModelFactory
 import com.github.mikephil.charting.animation.Easing
@@ -21,7 +22,6 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 
 class StatisticsFragment : Fragment() {
 
@@ -105,20 +105,12 @@ class StatisticsFragment : Fragment() {
 
     private fun observeData() {
         viewModel.allTransactions.observe(viewLifecycleOwner) { transactions ->
-            // Calculate expense by category
-            val expenseByCategory = transactions
-                .filter { it.type == "expense" }
-                .groupBy { it.category }
-                .mapValues { entry -> entry.value.sumOf { it.amount } }
+            val summary = FinanceCalculator.summarize(transactions)
+            val expenseByCategory = FinanceCalculator.expensesByCategory(transactions)
 
             updatePieChart(expenseByCategory)
-
-            // Calculate total income and expense
-            val totalIncome = transactions.filter { it.type == "income" }.sumOf { it.amount }
-            val totalExpense = transactions.filter { it.type == "expense" }.sumOf { it.amount }
-
-            updateBarChart(totalIncome, totalExpense)
-            updateSummary(totalIncome, totalExpense)
+            updateBarChart(summary.income, summary.expense)
+            updateSummary(summary.income, summary.expense)
         }
     }
 
