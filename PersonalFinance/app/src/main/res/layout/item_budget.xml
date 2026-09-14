@@ -6,7 +6,7 @@
     <data>
         <variable
             name="budget"
-            type="com.example.personalfinance.data.model.Budget" />
+            type="io.github.vuvannamsec.personalfinance.data.model.Budget" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
