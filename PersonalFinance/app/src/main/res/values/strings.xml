@@ -7,11 +7,13 @@
     <string name="nav_transactions">Transactions</string>
     <string name="nav_statistics">Statistics</string>
     <string name="nav_budget">Budget</string>
+    <string name="transaction_detail">Transaction Detail</string>
 
     <!-- Home -->
     <string name="balance">Balance</string>
     <string name="income">Income</string>
     <string name="expense">Expense</string>
+    <string name="expenses">Expenses</string>
     <string name="recent_transactions">Recent Transactions</string>
     <string name="see_all">See All</string>
     <string name="this_month">This Month</string>
@@ -22,8 +24,10 @@
     <string name="amount">Amount</string>
     <string name="category">Category</string>
     <string name="note">Note</string>
+    <string name="no_note">No note</string>
     <string name="date">Date</string>
     <string name="type">Type</string>
+    <string name="all">All</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
@@ -31,12 +35,19 @@
     <string name="enter_note">Enter note (optional)</string>
     <string name="select_category">Select category</string>
     <string name="select_date">Select date</string>
+    <string name="amount_required">Please enter an amount</string>
+    <string name="amount_invalid">Please enter a valid amount</string>
+    <string name="category_required">Please select a category</string>
+    <string name="transaction_added">Transaction added</string>
+    <string name="transaction_updated">Transaction updated</string>
+    <string name="delete_transaction_title">Delete Transaction</string>
 
     <!-- Statistics -->
     <string name="statistics">Statistics</string>
     <string name="expense_by_category">Expense by Category</string>
     <string name="income_vs_expense">Income vs Expense</string>
     <string name="monthly_overview">Monthly Overview</string>
+    <string name="no_chart_data">No data</string>
 
     <!-- Budget -->
     <string name="budget">Budget</string>
@@ -46,6 +57,10 @@
     <string name="spent">Spent</string>
     <string name="remaining">Remaining</string>
     <string name="over_budget">Over Budget</string>
+    <string name="budget_added">Budget added</string>
+    <string name="budget_updated">Budget updated</string>
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
 
     <!-- Common -->
     <string name="no_data">No data available</string>
@@ -56,5 +71,10 @@
     <string name="no">No</string>
 
     <!-- Currency -->
-    <string name="currency_format">$%,.2f</string>
+    <string name="currency_format">$%1$,.2f</string>
+    <string name="income_amount_format">+$%1$,.2f</string>
+    <string name="expense_amount_format">-$%1$,.2f</string>
+    <string name="spent_amount_format">Spent: $%1$,.2f</string>
+    <string name="remaining_amount_format">Remaining: $%1$,.2f</string>
+    <string name="over_amount_format">Over: $%1$,.2f</string>
 </resources>
