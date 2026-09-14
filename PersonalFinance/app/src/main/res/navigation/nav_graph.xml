@@ -80,6 +80,14 @@
             android:name="budgetId"
             app:argType="long"
             android:defaultValue="-1L" />
+        <argument
+            android:name="month"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="year"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
 
 </navigation>
