@@ -1,6 +1,11 @@
 package com.example.personalfinance.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.example.personalfinance.data.model.Category
 import com.example.personalfinance.data.repository.CategoryRepository
 import kotlinx.coroutines.launch
@@ -8,6 +13,18 @@ import kotlinx.coroutines.launch
 class CategoryViewModel(private val repository: CategoryRepository) : ViewModel() {
 
     val allCategories: LiveData<List<Category>> = repository.allCategories
+
+    private val selectedType = MutableLiveData("expense")
+
+    val categoriesForSelectedType: LiveData<List<Category>> = selectedType.switchMap { type ->
+        repository.getCategoriesByType(type)
+    }
+
+    fun selectType(type: String) {
+        if (selectedType.value != type) {
+            selectedType.value = type
+        }
+    }
 
     fun getCategoriesByType(type: String): LiveData<List<Category>> {
         return repository.getCategoriesByType(type)
