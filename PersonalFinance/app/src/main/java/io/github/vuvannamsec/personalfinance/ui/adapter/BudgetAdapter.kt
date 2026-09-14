@@ -44,20 +44,20 @@ class BudgetAdapter(
         fun bind(budget: Budget) {
             binding.apply {
                 tvCategory.text = budget.category
-                tvAmount.text = String.format("$%,.2f", budget.amount)
+                tvAmount.text = root.context.getString(R.string.currency_format, budget.amount)
 
                 val spent = getSpentAmount(budget.category)
                 val remaining = budget.amount - spent
                 val progress = if (budget.amount > 0) ((spent / budget.amount) * 100).toInt() else 0
 
-                tvSpent.text = String.format("Spent: $%,.2f", spent)
+                tvSpent.text = root.context.getString(R.string.spent_amount_format, spent)
 
                 if (remaining >= 0) {
-                    tvRemaining.text = String.format("Remaining: $%,.2f", remaining)
+                    tvRemaining.text = root.context.getString(R.string.remaining_amount_format, remaining)
                     tvRemaining.setTextColor(root.context.getColor(R.color.income_green))
                     progressBudget.setIndicatorColor(root.context.getColor(R.color.income_green))
                 } else {
-                    tvRemaining.text = String.format("Over: $%,.2f", -remaining)
+                    tvRemaining.text = root.context.getString(R.string.over_amount_format, -remaining)
                     tvRemaining.setTextColor(root.context.getColor(R.color.expense_red))
                     progressBudget.setIndicatorColor(root.context.getColor(R.color.expense_red))
                 }
