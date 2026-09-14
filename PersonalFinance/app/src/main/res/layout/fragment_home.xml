@@ -25,7 +25,6 @@
                 android:orientation="vertical"
                 android:padding="@dimen/spacing_md">
 
-                <!-- Header Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -49,10 +48,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_sm"
                             android:text="@string/balance"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/text_size_medium"
-                            android:layout_marginTop="@dimen/spacing_sm" />
+                            android:textSize="@dimen/text_size_medium" />
 
                         <TextView
                             android:id="@+id/tv_balance"
@@ -69,7 +68,6 @@
                             android:layout_marginTop="@dimen/spacing_lg"
                             android:orientation="horizontal">
 
-                            <!-- Income -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -94,7 +92,6 @@
 
                             </LinearLayout>
 
-                            <!-- Expense -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -125,7 +122,6 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Recent Transactions Header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -152,7 +148,6 @@
 
                 </LinearLayout>
 
-                <!-- Recent Transactions List -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_recent_transactions"
                     android:layout_width="match_parent"
@@ -162,7 +157,6 @@
                     tools:itemCount="5"
                     tools:listitem="@layout/item_transaction" />
 
-                <!-- Empty State -->
                 <TextView
                     android:id="@+id/tv_empty"
                     android:layout_width="match_parent"
@@ -184,6 +178,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/spacing_md"
+            android:contentDescription="@string/add_transaction"
             android:src="@drawable/ic_add"
             app:backgroundTint="@color/primary" />
 
