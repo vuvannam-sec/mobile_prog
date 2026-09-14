@@ -74,6 +74,7 @@ class AddBudgetFragment : Fragment() {
             )
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spinnerCategory.adapter = adapter
+            selectEditingCategory()
         }
     }
 
@@ -88,12 +89,16 @@ class AddBudgetFragment : Fragment() {
             editingBudget = budgetViewModel.getBudgetById(id)
             editingBudget?.let { budget ->
                 binding.etAmount.setText(budget.amount.toString())
-
-                val categoryIndex = categoryList.indexOf(budget.category)
-                if (categoryIndex >= 0) {
-                    binding.spinnerCategory.setSelection(categoryIndex)
-                }
+                selectEditingCategory()
             }
+        }
+    }
+
+    private fun selectEditingCategory() {
+        val category = editingBudget?.category ?: return
+        val categoryIndex = categoryList.indexOf(category)
+        if (categoryIndex >= 0) {
+            binding.spinnerCategory.setSelection(categoryIndex)
         }
     }
 

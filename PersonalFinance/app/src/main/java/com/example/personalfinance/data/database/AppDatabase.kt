@@ -24,6 +24,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
 
     companion object {
+        private const val DATABASE_NAME = "personal_finance_database"
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -32,10 +34,9 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "personal_finance_database"
+                    DATABASE_NAME
                 )
                     .addCallback(DatabaseCallback())
-                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
@@ -53,7 +54,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        suspend fun populateDefaultCategories(categoryDao: CategoryDao) {
+        private suspend fun populateDefaultCategories(categoryDao: CategoryDao) {
             val defaultCategories = listOf(
                 Category(name = "Food & Dining", icon = "ic_food", color = "#FF5722", type = "expense"),
                 Category(name = "Transportation", icon = "ic_transport", color = "#2196F3", type = "expense"),
