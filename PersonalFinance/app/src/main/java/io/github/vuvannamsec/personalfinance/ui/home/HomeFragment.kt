@@ -69,15 +69,15 @@ class HomeFragment : Fragment() {
 
     private fun observeData() {
         viewModel.balance.observe(viewLifecycleOwner) { balance ->
-            binding.tvBalance.text = String.format("$%,.2f", balance ?: 0.0)
+            binding.tvBalance.text = getString(R.string.currency_format, balance ?: 0.0)
         }
 
         viewModel.totalIncome.observe(viewLifecycleOwner) { income ->
-            binding.tvIncome.text = String.format("$%,.2f", income ?: 0.0)
+            binding.tvIncome.text = getString(R.string.currency_format, income ?: 0.0)
         }
 
         viewModel.totalExpense.observe(viewLifecycleOwner) { expense ->
-            binding.tvExpense.text = String.format("$%,.2f", expense ?: 0.0)
+            binding.tvExpense.text = getString(R.string.currency_format, expense ?: 0.0)
         }
 
         viewModel.allTransactions.observe(viewLifecycleOwner) { transactions ->
