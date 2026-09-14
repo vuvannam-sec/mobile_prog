@@ -9,17 +9,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.github.vuvannamsec.personalfinance.FinanceApplication
 import io.github.vuvannamsec.personalfinance.R
 import io.github.vuvannamsec.personalfinance.data.model.Transaction
 import io.github.vuvannamsec.personalfinance.databinding.FragmentTransactionDetailBinding
 import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModel
 import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModelFactory
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.Date
-import java.util.Locale
 
 class TransactionDetailFragment : Fragment() {
 
@@ -63,27 +62,31 @@ class TransactionDetailFragment : Fragment() {
 
     private fun displayTransaction(transaction: Transaction) {
         binding.apply {
-            tvType.text = transaction.type.replaceFirstChar { it.uppercase() }
+            val isIncome = transaction.type == "income"
+            tvType.text = getString(if (isIncome) R.string.income else R.string.expense)
 
-            if (transaction.type == "income") {
-                tvAmount.text = String.format("+$%,.2f", transaction.amount)
+            if (isIncome) {
+                tvAmount.text = getString(R.string.income_amount_format, transaction.amount)
                 tvAmount.setTextColor(requireContext().getColor(R.color.income_green))
                 tvType.setTextColor(requireContext().getColor(R.color.income_green))
             } else {
-                tvAmount.text = String.format("-$%,.2f", transaction.amount)
+                tvAmount.text = getString(R.string.expense_amount_format, transaction.amount)
                 tvAmount.setTextColor(requireContext().getColor(R.color.expense_red))
                 tvType.setTextColor(requireContext().getColor(R.color.expense_red))
             }
 
             tvCategory.text = transaction.category
             tvDate.text = formatDate(transaction.date)
-            tvNote.text = if (transaction.note.isNotEmpty()) transaction.note else "No note"
+            tvNote.text = if (transaction.note.isNotEmpty()) {
+                transaction.note
+            } else {
+                getString(R.string.no_note)
+            }
         }
     }
 
     private fun formatDate(timestamp: Long): String {
-        val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-        return sdf.format(Date(timestamp))
+        return DateFormat.getDateInstance(DateFormat.LONG).format(Date(timestamp))
     }
 
     private fun setupClickListeners() {
@@ -102,15 +105,15 @@ class TransactionDetailFragment : Fragment() {
 
     private fun showDeleteConfirmation() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete Transaction")
-            .setMessage(getString(R.string.confirm_delete))
-            .setPositiveButton(getString(R.string.yes)) { _, _ ->
+            .setTitle(R.string.delete_transaction_title)
+            .setMessage(R.string.confirm_delete)
+            .setPositiveButton(R.string.yes) { _, _ ->
                 currentTransaction?.let { transaction ->
                     viewModel.delete(transaction)
                     findNavController().navigateUp()
                 }
             }
-            .setNegativeButton(getString(R.string.no), null)
+            .setNegativeButton(R.string.no, null)
             .show()
     }
 

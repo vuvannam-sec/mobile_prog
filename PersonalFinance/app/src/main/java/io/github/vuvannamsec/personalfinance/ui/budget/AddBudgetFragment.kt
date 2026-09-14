@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import io.github.vuvannamsec.personalfinance.FinanceApplication
+import io.github.vuvannamsec.personalfinance.R
 import io.github.vuvannamsec.personalfinance.data.model.Budget
 import io.github.vuvannamsec.personalfinance.databinding.FragmentAddBudgetBinding
 import io.github.vuvannamsec.personalfinance.viewmodel.BudgetViewModel
@@ -103,43 +104,50 @@ class AddBudgetFragment : Fragment() {
     }
 
     private fun saveBudget() {
-        val amountText = binding.etAmount.text.toString()
+        val amountText = binding.etAmount.text.toString().trim()
         val selectedCategory = binding.spinnerCategory.selectedItem?.toString()
 
         if (amountText.isEmpty()) {
-            binding.tilAmount.error = "Please enter amount"
+            binding.tilAmount.error = getString(R.string.amount_required)
             return
         }
 
         val amount = amountText.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            binding.tilAmount.error = "Please enter valid amount"
+            binding.tilAmount.error = getString(R.string.amount_invalid)
             return
         }
+        binding.tilAmount.error = null
 
         if (selectedCategory.isNullOrEmpty()) {
-            Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.category_required, Toast.LENGTH_SHORT).show()
             return
         }
 
         val calendar = Calendar.getInstance()
-        val currentMonth = calendar.get(Calendar.MONTH) + 1
-        val currentYear = calendar.get(Calendar.YEAR)
+        val fallbackMonth = calendar.get(Calendar.MONTH) + 1
+        val fallbackYear = calendar.get(Calendar.YEAR)
+        val targetMonth = editingBudget?.month
+            ?: args.month.takeIf { it in 1..12 }
+            ?: fallbackMonth
+        val targetYear = editingBudget?.year
+            ?: args.year.takeIf { it > 0 }
+            ?: fallbackYear
 
         val budget = Budget(
             id = editingBudget?.id ?: 0,
             category = selectedCategory,
             amount = amount,
-            month = editingBudget?.month ?: currentMonth,
-            year = editingBudget?.year ?: currentYear
+            month = targetMonth,
+            year = targetYear
         )
 
         if (editingBudget != null) {
             budgetViewModel.update(budget)
-            Toast.makeText(requireContext(), "Budget updated", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.budget_updated, Toast.LENGTH_SHORT).show()
         } else {
             budgetViewModel.insert(budget)
-            Toast.makeText(requireContext(), "Budget added", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.budget_added, Toast.LENGTH_SHORT).show()
         }
 
         findNavController().navigateUp()

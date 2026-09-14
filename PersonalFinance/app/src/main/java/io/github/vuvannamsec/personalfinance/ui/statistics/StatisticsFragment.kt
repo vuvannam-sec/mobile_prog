@@ -7,12 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import io.github.vuvannamsec.personalfinance.FinanceApplication
-import io.github.vuvannamsec.personalfinance.R
-import io.github.vuvannamsec.personalfinance.databinding.FragmentStatisticsBinding
-import io.github.vuvannamsec.personalfinance.domain.FinanceCalculator
-import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModel
-import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModelFactory
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.BarData
@@ -22,6 +16,13 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
+import io.github.vuvannamsec.personalfinance.FinanceApplication
+import io.github.vuvannamsec.personalfinance.R
+import io.github.vuvannamsec.personalfinance.databinding.FragmentStatisticsBinding
+import io.github.vuvannamsec.personalfinance.domain.FinanceCalculator
+import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModel
+import io.github.vuvannamsec.personalfinance.viewmodel.TransactionViewModelFactory
 
 class StatisticsFragment : Fragment() {
 
@@ -60,7 +61,7 @@ class StatisticsFragment : Fragment() {
             holeRadius = 50f
             transparentCircleRadius = 55f
             setDrawCenterText(true)
-            centerText = "Expenses"
+            centerText = getString(R.string.expenses)
             setCenterTextSize(16f)
             animateY(1000, Easing.EaseInOutQuad)
 
@@ -117,7 +118,7 @@ class StatisticsFragment : Fragment() {
     private fun updatePieChart(expenseByCategory: Map<String, Double>) {
         if (expenseByCategory.isEmpty()) {
             binding.pieChart.clear()
-            binding.pieChart.centerText = "No Data"
+            binding.pieChart.centerText = getString(R.string.no_chart_data)
             return
         }
 
@@ -147,7 +148,7 @@ class StatisticsFragment : Fragment() {
 
         binding.pieChart.apply {
             data = PieData(dataSet)
-            centerText = "Expenses"
+            centerText = getString(R.string.expenses)
             invalidate()
         }
     }
@@ -171,11 +172,11 @@ class StatisticsFragment : Fragment() {
             data = BarData(dataSet).apply {
                 barWidth = 0.5f
             }
-            xAxis.valueFormatter = object : com.github.mikephil.charting.formatter.ValueFormatter() {
+            xAxis.valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     return when (value.toInt()) {
-                        0 -> "Income"
-                        1 -> "Expense"
+                        0 -> getString(R.string.income)
+                        1 -> getString(R.string.expense)
                         else -> ""
                     }
                 }
@@ -185,8 +186,8 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun updateSummary(income: Double, expense: Double) {
-        binding.tvTotalIncome.text = String.format("$%,.2f", income)
-        binding.tvTotalExpense.text = String.format("$%,.2f", expense)
+        binding.tvTotalIncome.text = getString(R.string.currency_format, income)
+        binding.tvTotalExpense.text = getString(R.string.currency_format, expense)
     }
 
     override fun onDestroyView() {

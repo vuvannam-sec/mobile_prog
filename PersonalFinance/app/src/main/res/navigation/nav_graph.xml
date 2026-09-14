@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="io.github.vuvannamsec.personalfinance.ui.home.HomeFragment"
-        android:label="Home"
+        android:label="@string/nav_home"
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_home_to_addTransaction"
@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/transactionsFragment"
         android:name="io.github.vuvannamsec.personalfinance.ui.transaction.TransactionsFragment"
-        android:label="Transactions"
+        android:label="@string/nav_transactions"
         tools:layout="@layout/fragment_transactions">
         <action
             android:id="@+id/action_transactions_to_addTransaction"
@@ -34,13 +34,13 @@
     <fragment
         android:id="@+id/statisticsFragment"
         android:name="io.github.vuvannamsec.personalfinance.ui.statistics.StatisticsFragment"
-        android:label="Statistics"
+        android:label="@string/nav_statistics"
         tools:layout="@layout/fragment_statistics" />
 
     <fragment
         android:id="@+id/budgetFragment"
         android:name="io.github.vuvannamsec.personalfinance.ui.budget.BudgetFragment"
-        android:label="Budget"
+        android:label="@string/nav_budget"
         tools:layout="@layout/fragment_budget">
         <action
             android:id="@+id/action_budget_to_addBudget"
@@ -50,7 +50,7 @@
     <fragment
         android:id="@+id/addTransactionFragment"
         android:name="io.github.vuvannamsec.personalfinance.ui.transaction.AddTransactionFragment"
-        android:label="Add Transaction"
+        android:label="@string/add_transaction"
         tools:layout="@layout/fragment_add_transaction">
         <argument
             android:name="transactionId"
@@ -61,7 +61,7 @@
     <fragment
         android:id="@+id/transactionDetailFragment"
         android:name="io.github.vuvannamsec.personalfinance.ui.transaction.TransactionDetailFragment"
-        android:label="Transaction Detail"
+        android:label="@string/transaction_detail"
         tools:layout="@layout/fragment_transaction_detail">
         <argument
             android:name="transactionId"
@@ -74,12 +74,20 @@
     <fragment
         android:id="@+id/addBudgetFragment"
         android:name="io.github.vuvannamsec.personalfinance.ui.budget.AddBudgetFragment"
-        android:label="Add Budget"
+        android:label="@string/add_budget"
         tools:layout="@layout/fragment_add_budget">
         <argument
             android:name="budgetId"
             app:argType="long"
             android:defaultValue="-1L" />
+        <argument
+            android:name="month"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="year"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
 
 </navigation>

@@ -19,7 +19,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Month Selector -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,8 +37,8 @@
                         android:id="@+id/iv_prev_month"
                         android:layout_width="@dimen/icon_size_medium"
                         android:layout_height="@dimen/icon_size_medium"
-                        android:src="@drawable/ic_arrow_left"
-                        android:contentDescription="Previous month" />
+                        android:contentDescription="@string/previous_month"
+                        android:src="@drawable/ic_arrow_left" />
 
                     <TextView
                         android:id="@+id/tv_month"
@@ -56,14 +55,13 @@
                         android:id="@+id/iv_next_month"
                         android:layout_width="@dimen/icon_size_medium"
                         android:layout_height="@dimen/icon_size_medium"
-                        android:src="@drawable/ic_arrow_right"
-                        android:contentDescription="Next month" />
+                        android:contentDescription="@string/next_month"
+                        android:src="@drawable/ic_arrow_right" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Budget List -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_budgets"
                 android:layout_width="match_parent"
@@ -73,7 +71,6 @@
                 tools:itemCount="5"
                 tools:listitem="@layout/item_budget" />
 
-            <!-- Empty State -->
             <TextView
                 android:id="@+id/tv_empty"
                 android:layout_width="match_parent"
@@ -93,6 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/spacing_md"
+            android:contentDescription="@string/add_budget"
             android:src="@drawable/ic_add"
             app:backgroundTint="@color/primary" />
 

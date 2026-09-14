@@ -19,7 +19,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Filter Chips -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,7 +37,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="All" />
+                        android:text="@string/all" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_income"
@@ -58,7 +57,6 @@
 
             </HorizontalScrollView>
 
-            <!-- Transactions List -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_transactions"
                 android:layout_width="match_parent"
@@ -68,7 +66,6 @@
                 tools:itemCount="10"
                 tools:listitem="@layout/item_transaction" />
 
-            <!-- Empty State -->
             <TextView
                 android:id="@+id/tv_empty"
                 android:layout_width="match_parent"
@@ -88,6 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/spacing_md"
+            android:contentDescription="@string/add_transaction"
             android:src="@drawable/ic_add"
             app:backgroundTint="@color/primary" />
 
