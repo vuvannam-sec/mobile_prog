@@ -6,7 +6,7 @@
     <data>
         <variable
             name="category"
-            type="com.example.personalfinance.data.model.Category" />
+            type="io.github.vuvannamsec.personalfinance.data.model.Category" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

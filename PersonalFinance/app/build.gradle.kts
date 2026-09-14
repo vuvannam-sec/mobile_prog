@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.personalfinance"
+    namespace = "io.github.vuvannamsec.personalfinance"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.personalfinance"
+        applicationId = "io.github.vuvannamsec.personalfinance"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
