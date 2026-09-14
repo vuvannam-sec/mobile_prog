@@ -1,61 +1,42 @@
 package com.example.personalfinance.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.example.personalfinance.data.model.Transaction
 import com.example.personalfinance.data.repository.TransactionRepository
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Calendar
 
 class TransactionViewModel(private val repository: TransactionRepository) : ViewModel() {
 
     val allTransactions: LiveData<List<Transaction>> = repository.allTransactions
 
-    private val _totalIncome = MutableLiveData<Double>()
-    val totalIncome: LiveData<Double> = _totalIncome
+    private val currentMonthRange = getCurrentMonthRange()
 
-    private val _totalExpense = MutableLiveData<Double>()
-    val totalExpense: LiveData<Double> = _totalExpense
+    val currentMonthTransactions: LiveData<List<Transaction>> = repository.getTransactionsByDateRange(
+        currentMonthRange.first,
+        currentMonthRange.second
+    )
 
-    private val _balance = MutableLiveData<Double>()
-    val balance: LiveData<Double> = _balance
+    val totalIncome: LiveData<Double> = repository
+        .getTotalByTypeAndDateRange("income", currentMonthRange.first, currentMonthRange.second)
+        .map { it ?: 0.0 }
 
-    private val _currentMonthTransactions = MutableLiveData<List<Transaction>>()
-    val currentMonthTransactions: LiveData<List<Transaction>> = _currentMonthTransactions
+    val totalExpense: LiveData<Double> = repository
+        .getTotalByTypeAndDateRange("expense", currentMonthRange.first, currentMonthRange.second)
+        .map { it ?: 0.0 }
 
-    init {
-        loadCurrentMonthData()
-    }
+    val balance: LiveData<Double> = MediatorLiveData<Double>().apply {
+        fun updateBalance() {
+            value = (totalIncome.value ?: 0.0) - (totalExpense.value ?: 0.0)
+        }
 
-    private fun loadCurrentMonthData() {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        val startOfMonth = calendar.timeInMillis
-
-        calendar.add(Calendar.MONTH, 1)
-        calendar.add(Calendar.MILLISECOND, -1)
-        val endOfMonth = calendar.timeInMillis
-
-        repository.getTotalByTypeAndDateRange("income", startOfMonth, endOfMonth)
-            .observeForever { income ->
-                _totalIncome.value = income ?: 0.0
-                updateBalance()
-            }
-
-        repository.getTotalByTypeAndDateRange("expense", startOfMonth, endOfMonth)
-            .observeForever { expense ->
-                _totalExpense.value = expense ?: 0.0
-                updateBalance()
-            }
-    }
-
-    private fun updateBalance() {
-        val income = _totalIncome.value ?: 0.0
-        val expense = _totalExpense.value ?: 0.0
-        _balance.value = income - expense
+        addSource(totalIncome) { updateBalance() }
+        addSource(totalExpense) { updateBalance() }
     }
 
     fun getTransactionsByType(type: String): LiveData<List<Transaction>> {
@@ -72,21 +53,35 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
 
     fun insert(transaction: Transaction) = viewModelScope.launch {
         repository.insert(transaction)
-        loadCurrentMonthData()
     }
 
     fun update(transaction: Transaction) = viewModelScope.launch {
         repository.update(transaction)
-        loadCurrentMonthData()
     }
 
     fun delete(transaction: Transaction) = viewModelScope.launch {
         repository.delete(transaction)
-        loadCurrentMonthData()
     }
 
     suspend fun getTransactionById(id: Long): Transaction? {
         return repository.getTransactionById(id)
+    }
+
+    private fun getCurrentMonthRange(): Pair<Long, Long> {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfMonth = calendar.timeInMillis
+
+        calendar.add(Calendar.MONTH, 1)
+        calendar.add(Calendar.MILLISECOND, -1)
+        val endOfMonth = calendar.timeInMillis
+
+        return startOfMonth to endOfMonth
     }
 }
 
