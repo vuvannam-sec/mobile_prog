@@ -9,9 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import io.github.vuvannamsec.personalfinance.R
 import io.github.vuvannamsec.personalfinance.data.model.Transaction
 import io.github.vuvannamsec.personalfinance.databinding.ItemTransactionBinding
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.Date
-import java.util.Locale
 
 class TransactionAdapter(
     private val onItemClick: (Transaction) -> Unit
@@ -46,15 +45,19 @@ class TransactionAdapter(
         fun bind(transaction: Transaction) {
             binding.apply {
                 tvCategory.text = transaction.category
-                tvNote.text = if (transaction.note.isNotEmpty()) transaction.note else "No note"
+                tvNote.text = if (transaction.note.isNotEmpty()) {
+                    transaction.note
+                } else {
+                    root.context.getString(R.string.no_note)
+                }
                 tvDate.text = formatDate(transaction.date)
 
                 val amount = transaction.amount
                 if (transaction.type == "income") {
-                    tvAmount.text = String.format("+$%,.2f", amount)
+                    tvAmount.text = root.context.getString(R.string.income_amount_format, amount)
                     tvAmount.setTextColor(root.context.getColor(R.color.income_green))
                 } else {
-                    tvAmount.text = String.format("-$%,.2f", amount)
+                    tvAmount.text = root.context.getString(R.string.expense_amount_format, amount)
                     tvAmount.setTextColor(root.context.getColor(R.color.expense_red))
                 }
 
@@ -64,8 +67,7 @@ class TransactionAdapter(
         }
 
         private fun formatDate(timestamp: Long): String {
-            val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-            return sdf.format(Date(timestamp))
+            return DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(timestamp))
         }
 
         private fun getCategoryColor(category: String): String {
